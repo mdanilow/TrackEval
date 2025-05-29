@@ -7,11 +7,11 @@ import numpy as np
 
 # TRACKER_NAME = 'output_ua-detrac_unfreeze2'
 # TRACKER_NAME = 'output_UA_DETRAC_ema'
-TRACKER_NAME = 'quantyolov8_4w4a_mot15_cl0_bkp'
+TRACKER_NAME = 'floatyolov8n_640_cl0_test'
 # TRACKER_NAME = 'output_lasteval_4w4a_mot17'
 # SEQUENCES = ['MVI_40701', 'MVI_40771', 'MVI_40863']
-SEQUENCES = 'all'
-# SEQUENCES = ['TUD-Stadtmitte']
+# SEQUENCES = 'all'
+SEQUENCES = ['ETH-Sunnyday']
 BENCHMARK = 'MOT15'
 
 TRACKER_PATH = join('../sort/output', TRACKER_NAME)
@@ -19,11 +19,13 @@ DATASET_PATH = '/media/vision/1d6890f4-df75-4531-a044-f6d3d44d033d/Downloads/{}/
 # TRACKER_PATH = join('data/trackers/UA_DETRAC/', TRACKER_NAME)
 # DATASET_PATH = '/media/vision/storage1/Datasets/UA_DETRAC/sorted/test'
 
-def draw_bboxes(img, dets, color=(0, 0, 255), id_to_color=None, id_to_trajectory=None):
+SCALE = 2
+
+def draw_bboxes(img, dets, color=(0, 0, 255), id_to_color=None, id_to_trajectory=None, show_id=True):
     # gt = dets.shape[-1] == 9
     # color = (0, 0, 255) if gt else (0, 255, 0)
     for det in dets:
-        obj_id = det[1]
+        obj_id = int(det[1])
         if id_to_color is not None and obj_id not in id_to_color:
             id_to_color[obj_id] = (np.random.randint(256), np.random.randint(256), np.random.randint(256))
         xywh = det[2:6]
@@ -35,20 +37,22 @@ def draw_bboxes(img, dets, color=(0, 0, 255), id_to_color=None, id_to_trajectory
             if obj_id not in id_to_trajectory:
                 id_to_trajectory[obj_id] = []
             center = (xywh[0] + xywh[2]//2, xywh[1] + xywh[3]//2)
-            id_to_trajectory[obj_id].append(center) 
-            for point in id_to_trajectory[obj_id]:
-                img = cv2.circle(img, point, radius=1, color=id_to_color[obj_id], thickness=2)
-        img = cv2.rectangle(img, (xywh[0], xywh[1]), (xywh[0]+xywh[2], xywh[1]+xywh[3]), id_to_color[obj_id] if id_to_color else color, 2)
+            id_to_trajectory[obj_id].append(center)
+            if id_to_color is not None:
+                for point in id_to_trajectory[obj_id]:
+                    img = cv2.circle(img, point, radius=1, color=id_to_color[obj_id], thickness=2)
+        img = cv2.rectangle(img, (xywh[0], xywh[1]), (xywh[0]+xywh[2], xywh[1]+xywh[3]), id_to_color[obj_id] if id_to_color else color, 1)
         font_scale = 0.5
         line_thickness = 1
         # print('HELLO')
-        img = cv2.putText(img, str(det[7:]),
-                        (xywh[0], xywh[1] + 15),
-                        cv2.FONT_HERSHEY_SIMPLEX,
-                        font_scale,
-                        (0, 255, 0),
-                        line_thickness,
-                        cv2.LINE_AA)
+        if show_id:
+            img = cv2.putText(img, str(obj_id),
+                                (xywh[0] + 5, xywh[1] + 15),
+                                cv2.FONT_HERSHEY_SIMPLEX,
+                                font_scale,
+                                (0, 0, 255),
+                                line_thickness,
+                                cv2.LINE_AA)
 
 
 for seqname in os.listdir(DATASET_PATH):
@@ -70,15 +74,17 @@ for seqname in os.listdir(DATASET_PATH):
         for frame_idx, imgname in enumerate(imgnames):
             frame_idx += 1
             imgpath = join(imgs_path, imgname)
-            print(frame_idx, imgname)
+            # print(frame_idx, imgname)
             frame_tracks = seq_tracks[seq_tracks[:, 0] == frame_idx]
-            # print('frame tracks:', frame_tracks)
             frame_gt = seq_gt[seq_gt[:, 0] == frame_idx]
+            frame_tracks[:, 2:6] *= SCALE
+            frame_gt[:, 2:6] *= SCALE
             
             img = cv2.imread(imgpath)
+            img = cv2.resize(img, (0, 0), fx=SCALE, fy=SCALE)
             orig_img = img.copy()
-            # draw_bboxes(img, frame_gt, (0, 0, 255))
-            draw_bboxes(img, frame_tracks, color=(0, 255, 0), id_to_color=id_to_color, id_to_trajectory=id_to_trajectory)    
+            draw_bboxes(img, frame_gt, (0, 255, 0), show_id=False)
+            draw_bboxes(img, frame_tracks, color=(0, 0, 255), id_to_color=None, id_to_trajectory=id_to_trajectory)    
 
             cv2.imshow(seqname, img)
             key = cv2.waitKey(0)

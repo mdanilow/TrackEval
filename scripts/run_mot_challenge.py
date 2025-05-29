@@ -72,6 +72,10 @@ if __name__ == '__main__':
                 x = None
             elif setting == 'SEQ_INFO':
                 x = dict(zip(args[setting], [None]*len(args[setting])))
+            elif setting == 'SINGLE_SEQUENCE':
+                x = args[setting][0]
+                if x == "None":
+                    x = None
             else:
                 x = args[setting]
             config[setting] = x

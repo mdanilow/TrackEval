@@ -37,6 +37,7 @@ class MotChallenge2DBox(_BaseDataset):
             'SKIP_SPLIT_FOL': False,  # If False, data is in GT_FOLDER/BENCHMARK-SPLIT_TO_EVAL/ and in
                                       # TRACKERS_FOLDER/BENCHMARK-SPLIT_TO_EVAL/tracker/
                                       # If True, then the middle 'benchmark-split' folder is skipped for both.
+            'SINGLE_SEQUENCE': None,
         }
         return default_config
 
@@ -169,6 +170,9 @@ class MotChallenge2DBox(_BaseDataset):
                     ini_data = configparser.ConfigParser()
                     ini_data.read(ini_file)
                     seq_lengths[seq] = int(ini_data['Sequence']['seqLength'])
+        if self.config['SINGLE_SEQUENCE'] is not None:
+            print('is not none:', self.config['SINGLE_SEQUENCE'])
+            seq_list = [self.config['SINGLE_SEQUENCE']]
         return seq_list, seq_lengths
 
     def _load_raw_file(self, tracker, seq, is_gt):

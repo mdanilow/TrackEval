@@ -7,14 +7,15 @@ import numpy as np
 
 # TRACKER_NAME = 'output_ua-detrac_unfreeze2'
 # TRACKER_NAME = 'output_UA_DETRAC_ema'
-TRACKER_NAME = 'floatyolov8n_640_cl0_test'
+# TRACKER_NAME = 'sort_baseline'
+TRACKER_NAME = 'mot15dets_base_sort'
 # TRACKER_NAME = 'output_lasteval_4w4a_mot17'
 # SEQUENCES = ['MVI_40701', 'MVI_40771', 'MVI_40863']
 # SEQUENCES = 'all'
 SEQUENCES = ['ETH-Sunnyday']
 BENCHMARK = 'MOT15'
 
-TRACKER_PATH = join('../sort/output', TRACKER_NAME)
+TRACKER_PATH = join('../dcf_mot/output', TRACKER_NAME)
 DATASET_PATH = '/media/vision/1d6890f4-df75-4531-a044-f6d3d44d033d/Downloads/{}/train'.format(BENCHMARK)
 # TRACKER_PATH = join('data/trackers/UA_DETRAC/', TRACKER_NAME)
 # DATASET_PATH = '/media/vision/storage1/Datasets/UA_DETRAC/sorted/test'

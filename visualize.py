@@ -8,7 +8,7 @@ import numpy as np
 # TRACKER_NAME = 'output_ua-detrac_unfreeze2'
 # TRACKER_NAME = 'output_UA_DETRAC_ema'
 # TRACKER_NAME = 'sort_baseline'
-TRACKER_NAME = 'mot15dets_base_sort'
+TRACKER_NAME = 'sortdets_base_sort_sunny'
 # TRACKER_NAME = 'output_lasteval_4w4a_mot17'
 # SEQUENCES = ['MVI_40701', 'MVI_40771', 'MVI_40863']
 # SEQUENCES = 'all'
@@ -21,6 +21,18 @@ DATASET_PATH = '/media/vision/1d6890f4-df75-4531-a044-f6d3d44d033d/Downloads/{}/
 # DATASET_PATH = '/media/vision/storage1/Datasets/UA_DETRAC/sorted/test'
 
 SCALE = 2
+
+def draw_text_line(img, text, line=0, color=(0, 0, 0)):
+    x_pos = 10
+    y_pos = 20 + line * 20
+    img = cv2.putText(img,
+                      text,
+                      (x_pos, y_pos),
+                      cv2.FONT_HERSHEY_SIMPLEX,
+                      0.75,
+                      color,
+                      1,
+                      cv2.LINE_AA)
 
 def draw_bboxes(img, dets, color=(0, 0, 255), id_to_color=None, id_to_trajectory=None, show_id=True):
     # gt = dets.shape[-1] == 9
@@ -72,9 +84,10 @@ for seqname in os.listdir(DATASET_PATH):
 
         imgnames = os.listdir(imgs_path)
         imgnames.sort()
-        for frame_idx, imgname in enumerate(imgnames):
-            frame_idx += 1
-            imgpath = join(imgs_path, imgname)
+        key = None
+        frame_idx = 1
+        while(frame_idx >= 1 and frame_idx <= len(imgnames)):
+            imgpath = join(imgs_path, imgnames[frame_idx - 1])
             # print(frame_idx, imgname)
             frame_tracks = seq_tracks[seq_tracks[:, 0] == frame_idx]
             frame_gt = seq_gt[seq_gt[:, 0] == frame_idx]
@@ -86,12 +99,19 @@ for seqname in os.listdir(DATASET_PATH):
             orig_img = img.copy()
             draw_bboxes(img, frame_gt, (0, 255, 0), show_id=False)
             draw_bboxes(img, frame_tracks, color=(0, 0, 255), id_to_color=None, id_to_trajectory=id_to_trajectory)    
+            draw_text_line(img, "Frame: {}".format(frame_idx))
 
             cv2.imshow(seqname, img)
             key = cv2.waitKey(0)
             if key == ord('s'):
                 cv2.destroyAllWindows()
                 break
+            elif key == ord('.'):
+                if frame_idx < len(imgnames):
+                    frame_idx += 1
+            elif key == ord(','):
+                if frame_idx > 1:
+                    frame_idx -= 1
             elif key == ord('q'):
                 cv2.destroyAllWindows()
                 sys.exit()

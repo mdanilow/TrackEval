@@ -55,7 +55,7 @@ class MotChallenge2DBox(_BaseDataset):
         else:
             split_fol = ''
         self.gt_fol = os.path.join(self.config['GT_FOLDER'], split_fol)
-        self.tracker_fol = os.path.join(self.config['TRACKERS_FOLDER'], split_fol)
+        self.tracker_fol = os.path.join(self.config['TRACKERS_FOLDER'])
         self.should_classes_combine = False
         self.use_super_categories = False
         self.data_is_zipped = self.config['INPUT_AS_ZIP']
@@ -166,7 +166,7 @@ class MotChallenge2DBox(_BaseDataset):
                     seq_list.append(seq)
                     ini_file = os.path.join(self.gt_fol, seq, 'seqinfo.ini')
                     if not os.path.isfile(ini_file):
-                        raise TrackEvalException('ini file does not exist: ' + seq + '/' + os.path.basename(ini_file))
+                        raise TrackEvalException('ini file does not exist: ', ini_file)
                     ini_data = configparser.ConfigParser()
                     ini_data.read(ini_file)
                     seq_lengths[seq] = int(ini_data['Sequence']['seqLength'])

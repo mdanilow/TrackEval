@@ -99,7 +99,7 @@ class MotChallenge2DBox(_BaseDataset):
 
         # Get trackers to eval
         if self.config['TRACKERS_TO_EVAL'] is None:
-            self.tracker_list = os.listdir(self.tracker_fol)
+            self.tracker_list = [directory for directory in os.listdir(self.tracker_fol) if os.path.isdir(os.path.join(self.tracker_fol, directory))]
         else:
             self.tracker_list = self.config['TRACKERS_TO_EVAL']
 

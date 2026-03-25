@@ -5,24 +5,30 @@ import sys
 import cv2
 import numpy as np
 
-# TRACKER_NAME = 'output_ua-detrac_unfreeze2'
-# TRACKER_NAME = 'output_UA_DETRAC_ema'
-# TRACKER_NAME = 'sort_baseline'
-TRACKER_NAME = 'sortdets_base_sort_sunny'
-# TRACKER_NAME = 'output_lasteval_4w4a_mot17'
-# SEQUENCES = ['MVI_40701', 'MVI_40771', 'MVI_40863']
-# SEQUENCES = 'all'
-SEQUENCES = ['ETH-Sunnyday']
-BENCHMARK = 'MOT15'
+
+TRACKER_NAME = 'yolox_mot17_val_half_bytetracker_base'
+# TRACKER_NAME = 'ByteTrack'
+
+SEQUENCES = 'all'
+# SEQUENCES = ['ETH-Sunnyday']
+# SEQUENCES = ["MOT17-02-FRCNN"]
+# SEQUENCES = ['PETS09-S2L1']
+# BENCHMARK = 'MOT15'
+
+TRACKER2_NAME = 'yolox_mot17_val_half_presubmission'
+
+BENCHMARK = 'MOT17'
+SPLIT = 'train'
+SCALE = 1
 
 TRACKER_PATH = join('../dcf_mot/output', TRACKER_NAME)
-DATASET_PATH = '/media/vision/1d6890f4-df75-4531-a044-f6d3d44d033d/Downloads/{}/train'.format(BENCHMARK)
+TRACKER2_PATH = join('../dcf_mot/output', TRACKER2_NAME)
+DATASET_PATH = '/media/vision/1d6890f4-df75-4531-a044-f6d3d44d033d/Downloads/{}/{}'.format(BENCHMARK, SPLIT)
 # TRACKER_PATH = join('data/trackers/UA_DETRAC/', TRACKER_NAME)
 # DATASET_PATH = '/media/vision/storage1/Datasets/UA_DETRAC/sorted/test'
 
-SCALE = 2
 
-def draw_text_line(img, text, line=0, color=(0, 0, 0)):
+def draw_text_line(img, text, line=0, color=(0, 255, 0)):
     x_pos = 10
     y_pos = 20 + line * 20
     img = cv2.putText(img,
@@ -68,14 +74,17 @@ def draw_bboxes(img, dets, color=(0, 0, 255), id_to_color=None, id_to_trajectory
                                 cv2.LINE_AA)
 
 
-for seqname in os.listdir(DATASET_PATH):
+sequences = [filename.strip(".txt") for filename in os.listdir(join(TRACKER_PATH, "data"))]
+for seqname in sequences:
     if SEQUENCES == 'all' or seqname in SEQUENCES:
         tracker_results_txt = join(TRACKER_PATH, 'data', seqname + '.txt')
+        tracker2_results_txt = join(TRACKER2_PATH, 'data', seqname + '.txt')
         gt_txt = join(DATASET_PATH, seqname, 'gt', 'gt.txt')
         imgs_path = join(DATASET_PATH, seqname, 'img1')
 
         seq_tracks = np.loadtxt(tracker_results_txt, delimiter=',', dtype=float)
-        seq_gt = np.loadtxt(gt_txt, delimiter=',', dtype=float)
+        seq_tracks2 = np.loadtxt(tracker2_results_txt, delimiter=',', dtype=float)
+        # seq_gt = np.loadtxt(gt_txt, delimiter=',', dtype=float)
 
         # print('t:', seq_tracks.shape)
         # print(seq_gt.shape)
@@ -90,15 +99,18 @@ for seqname in os.listdir(DATASET_PATH):
             imgpath = join(imgs_path, imgnames[frame_idx - 1])
             # print(frame_idx, imgname)
             frame_tracks = seq_tracks[seq_tracks[:, 0] == frame_idx]
-            frame_gt = seq_gt[seq_gt[:, 0] == frame_idx]
+            frame_tracks2 = seq_tracks2[seq_tracks2[:, 0] == frame_idx]
+            # frame_gt = seq_gt[seq_gt[:, 0] == frame_idx]
             frame_tracks[:, 2:6] *= SCALE
-            frame_gt[:, 2:6] *= SCALE
+            # frame_gt[:, 2:6] *= SCALE
             
             img = cv2.imread(imgpath)
             img = cv2.resize(img, (0, 0), fx=SCALE, fy=SCALE)
             orig_img = img.copy()
-            draw_bboxes(img, frame_gt, (0, 255, 0), show_id=False)
+            # draw_bboxes(img, frame_gt, (0, 255, 0), show_id=False)
             draw_bboxes(img, frame_tracks, color=(0, 0, 255), id_to_color=None, id_to_trajectory=id_to_trajectory)    
+            draw_bboxes(img, frame_tracks2, color=(0, 255, 0), id_to_color=None, id_to_trajectory=id_to_trajectory)    
+            
             draw_text_line(img, "Frame: {}".format(frame_idx))
 
             cv2.imshow(seqname, img)

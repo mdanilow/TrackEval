@@ -35,6 +35,7 @@ Command Line Arguments: Defaults, # Comments
 
 import sys
 import os
+from os.path import join
 import argparse
 from multiprocessing import freeze_support
 import json
@@ -100,6 +101,7 @@ if __name__ == '__main__':
         "MOTP": round(results["MOTP"], 4) * 100,
         "IDSW": int(results["IDSW"])
     }
-    with open("scores.json", "w") as file:
-        json.dump(scores, file, indent=2)
-        
+    if args["OUTPUT_DIR"] != "":
+        with open(join(args["OUTPUT_DIR"], "scores.json"), "w") as file:
+            json.dump(scores, file, indent=2)
+

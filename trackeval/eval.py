@@ -39,6 +39,8 @@ class Evaluator:
             'OUTPUT_EMPTY_CLASSES': True,  # If False, summary files are not output for classes with no detections
             'OUTPUT_DETAILED': True,
             'PLOT_CURVES': True,
+
+            'OUTPUT_DIR': ""
         }
         return default_config
 

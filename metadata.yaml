@@ -1,0 +1,2 @@
+description: Scoring program runs mot evaluation
+command: python3 scripts/run_mot_challenge.py --SPLIT_TO_EVAL test --METRICS CLEAR --BENCHMARK evs_mot --TRACKERS_FOLDER /app/input --TRACKERS_TO_EVAL submission --OUTPUT_DIR /app/output

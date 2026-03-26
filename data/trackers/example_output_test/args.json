@@ -1,0 +1,39 @@
+{
+    "args": {
+        "detections_dir": "../yolo_finn/runs/detect",
+        "detections": "evs_mot-test",
+        "config": "configs/bytetracker_cmc.json",
+        "output_dir": "output",
+        "debug_images": "/home/vision/danilowi/dydaktyka/zaw_mot_competition/evs_mot_dataset/evs_mot-test",
+        "debug": false,
+        "debug_vis_scale": 1,
+        "name": "bytetracker_cmc",
+        "single_sequence": "None",
+        "det_score_division": 1.0,
+        "params_search": ""
+    },
+    "tracker_config": {
+        "det_conf_thresholds": [
+            0.1,
+            0.6
+        ],
+        "new_det_conf_th": 0.7,
+        "track_buffer": 30,
+        "match_thresholds": [
+            0.8,
+            0.5
+        ],
+        "min_box_area": 100,
+        "init_iou_suppress": 9999,
+        "not_matched_for_lost_th": 0,
+        "handle_occlusion": false,
+        "biou_buffer_sizes": [
+            0,
+            0
+        ],
+        "cmc_method": "sparseOptFlow"
+    },
+    "dcf_config": {
+        "use_conv_features": -1
+    }
+}

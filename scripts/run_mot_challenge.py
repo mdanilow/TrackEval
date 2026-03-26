@@ -37,6 +37,7 @@ import sys
 import os
 import argparse
 from multiprocessing import freeze_support
+import json
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import trackeval  # noqa: E402
@@ -92,4 +93,13 @@ if __name__ == '__main__':
             metrics_list.append(metric(metrics_config))
     if len(metrics_list) == 0:
         raise Exception('No metrics selected for evaluation')
-    evaluator.evaluate(dataset_list, metrics_list)
+    output_res, _ = evaluator.evaluate(dataset_list, metrics_list)
+    results = list(output_res["MotChallenge2DBox"].values())[0]["COMBINED_SEQ"]["pedestrian"]["CLEAR"]
+    scores = {
+        "MOTA": round(results["MOTA"], 4) * 100,
+        "MOTP": round(results["MOTP"], 4) * 100,
+        "IDSW": int(results["IDSW"])
+    }
+    with open("scores.json", "w") as file:
+        json.dump(scores, file, indent=2)
+        
